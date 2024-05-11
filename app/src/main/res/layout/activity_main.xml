@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:backgroundTint="@color/action_button"
+        android:background="@color/action_button"
         android:text="ADD TASK"
         android:textSize="10sp"
         android:textStyle="bold"
