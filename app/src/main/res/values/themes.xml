@@ -17,8 +17,6 @@
         <item name="shapeAppearance">@style/CutShape</item>
         <item name="hintTextColor">@color/black</item>
         <item name="boxStrokeColor">@color/black</item>
-        <item name="endIconDrawable">clear_text</item>
-        <item name="errorIconDrawable">@null</item>
         <item name="errorEnabled">true</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textCursorDrawable">@color/black</item>

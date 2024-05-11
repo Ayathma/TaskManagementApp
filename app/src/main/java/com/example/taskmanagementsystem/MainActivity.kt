@@ -27,6 +27,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
+        enableEdgeToEdge()
+        mainBinding.fabAddTask.setOnClickListener {
+            addTaskDialog.show()
+        }
 
     }
 }
