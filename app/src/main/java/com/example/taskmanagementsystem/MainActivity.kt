@@ -10,11 +10,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.madlab4.utils.setupDialog
 import com.example.madlab4.utils.validateEditText
 import com.example.taskmanagementsystem.databinding.ActivityMainBinding
+import com.example.taskmanagementsystem.viewmodels.TaskViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import java.util.Date
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +39,9 @@ class MainActivity : AppCompatActivity() {
         Dialog(this).apply {
             setupDialog(R.layout.loading_dialog)
         }
+    }
+    private val taskViewModel : TaskViewModel by lazy {
+        ViewModelProvider(this)[TaskViewModel::class.java]
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,10 +77,20 @@ class MainActivity : AppCompatActivity() {
         saveTaskBtn.setOnClickListener {
             if (validateEditText(addETTitle, addETTitleL)
                 && validateEditText(addETDesc, addETDescL)
-                ){
-                addTaskDialog.dismiss()
-                Toast.makeText(this, "validated!!", Toast.LENGTH_LONG).show()
-                loadingDialog.show()
+            ) {
+
+                val newTask = Task(
+                    UUID.randomUUID().toString(),
+                    addETTitle.text.toString().trim(),
+                    addETDesc.text.toString().trim(),
+                    Date()
+                )
+
+                taskViewModel.insertTask(newTask).observe(this){
+                    when(it.status) {
+
+                    }
+                }
             }
         }
         //add task end

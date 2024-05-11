@@ -12,6 +12,8 @@ enum class Status{
     ERROR,
     LOADING
 }
+
+
 fun Dialog.setupDialog(layoutResId: Int) {
     setContentView(layoutResId)
     window!!.setLayout(
