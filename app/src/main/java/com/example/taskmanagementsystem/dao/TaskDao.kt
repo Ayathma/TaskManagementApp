@@ -8,7 +8,15 @@ import kotlinx.coroutines.flow.Flow
 interface TaskDao {
 
     @Query("SELECT * FROM Task ORDER BY date DESC")
-    fun taskList(): Flow<List<Task>>
+    fun getTaskList(): Flow<List<Task>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task:Task): Long
+    @Query("DELETE FROM Task WHERE taskId == :taskId")
+    suspend fun deleteTask(taskId: String) : Int
+
+    @Update
+    suspend fun updateTask(task: Task): Int
+
+    @Query("UPDATE Task SET taskTitle=:title, description=:description WHERE taskId=:taskId")
+    suspend fun updateTaskParticularField(taskId: String, title: String, description: String): Int
 }

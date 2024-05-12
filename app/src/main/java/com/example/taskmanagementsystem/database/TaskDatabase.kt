@@ -1,14 +1,11 @@
 package com.example.taskmanagementsystem.models
 
-import android.animation.TypeConverter
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.coding.meet.taskmanagementsystem.converters.TypeConverter
-import com.coding.meet.taskmanagementsystem.models.Task
+import androidx.room.*
+import com.example.taskmanagementsystem.converters.TypeConverter
 import com.example.taskmanagementsystem.dao.TaskDao
+import com.example.taskmanagementsystem.models.Task
 
 @Database(
     entities = [Task::class],
@@ -19,7 +16,6 @@ import com.example.taskmanagementsystem.dao.TaskDao
 abstract class TaskDatabase : RoomDatabase() {
 
     abstract val taskDao : TaskDao
-
     companion object {
         @Volatile
         private var INSTANCE: TaskDatabase? = null
@@ -28,12 +24,11 @@ abstract class TaskDatabase : RoomDatabase() {
                 return INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     TaskDatabase::class.java,
-                    "task_db"
+                    name = "task_db"
                 ).build().also {
                     INSTANCE = it
                 }
             }
-
         }
     }
 

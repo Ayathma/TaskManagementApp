@@ -14,12 +14,9 @@ enum class Status{
     ERROR,
     LOADING
 }
-fun Context.longToastShow(msg: String)
-{
+fun Context.longToastShow(msg: String){
     Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
 }
-
-
 fun Dialog.setupDialog(layoutResId: Int) {
     setContentView(layoutResId)
     window!!.setLayout(
@@ -29,7 +26,7 @@ fun Dialog.setupDialog(layoutResId: Int) {
     setCancelable(false)
 }
 
- fun validateEditText(editText: EditText,  textTextInputLayout: TextInputLayout): Boolean {
+fun validateEditText(editText: TextInputEditText, textTextInputLayout: TextInputLayout): Boolean {
     return when {
         editText.text.toString().trim().isEmpty() -> {
             textTextInputLayout.error = "Required"
@@ -42,7 +39,9 @@ fun Dialog.setupDialog(layoutResId: Int) {
         }
     }
 }
-fun clearEditText(editText: EditText,  textTextInputLayout: TextInputLayout) {
+
+fun clearEditText(editText: TextInputEditText, textTextInputLayout: TextInputLayout) {
     editText.text = null
     textTextInputLayout.error = null
+
 }

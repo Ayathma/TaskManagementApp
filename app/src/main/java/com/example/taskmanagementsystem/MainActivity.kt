@@ -4,55 +4,33 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import androidx.room.Query
-import com.coding.meet.todo_app.adapters.TaskRVVBListAdapter
-import com.coding.meet.todo_app.databinding.ActivityMainBinding
-import com.coding.meet.todo_app.models.Task
-import com.coding.meet.todo_app.utils.Status
-import com.coding.meet.todo_app.utils.StatusResult
-import com.coding.meet.todo_app.utils.StatusResult.Added
-import com.coding.meet.todo_app.utils.StatusResult.Deleted
-import com.coding.meet.todo_app.utils.StatusResult.Updated
-import com.coding.meet.todo_app.utils.clearEditText
-import com.coding.meet.todo_app.utils.hideKeyBoard
-import com.coding.meet.todo_app.utils.longToastShow
-import com.coding.meet.todo_app.utils.setupDialog
-import com.coding.meet.todo_app.utils.validateEditText
-import com.coding.meet.todo_app.viewmodels.TaskViewModel
 import com.example.madlab4.utils.Status
 import com.example.madlab4.utils.clearEditText
+import com.example.madlab4.utils.longToastShow
 import com.example.madlab4.utils.setupDialog
 import com.example.madlab4.utils.validateEditText
+import com.example.taskmanagementsystem.adapters.TaskRVVBListAdapter
 import com.example.taskmanagementsystem.databinding.ActivityMainBinding
 import com.example.taskmanagementsystem.models.Task
+//import com.example.taskmanagementsystem.utils.Status
+//import com.example.taskmanagementsystem.utils.clearEditText
+//import com.example.taskmanagementsystem.utils.longToastShow
+//import com.example.taskmanagementsystem.utils.setupDialog
+//import com.example.taskmanagementsystem.utils.validateEditText
 import com.example.taskmanagementsystem.viewmodels.TaskViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
-
 class MainActivity : AppCompatActivity() {
 
    private val mainBinding: ActivityMainBinding by lazy {
@@ -80,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
         enableEdgeToEdge()
+
         //add task start
         val addETTitle = addTaskDialog.findViewById<TextInputEditText>(R.id.edTaskTitle)
         val addETTitleL = addTaskDialog.findViewById<TextInputLayout>(R.id.edTaskTitleL)
@@ -121,27 +100,31 @@ class MainActivity : AppCompatActivity() {
                     Date()
                 )
 
-                taskViewModel.insertTask(newTask).observe(this){
-                    when(it.status){
+                taskViewModel.insertTask(newTask).observe(this) {
+                    when (it.status) {
                         Status.LOADING -> {
                             loadingDialog.show()
                         }
+
                         Status.SUCCESS -> {
                             loadingDialog.dismiss()
-                            if(it.data?.toInt() != -1){
-                                LongToastShow(msg)
+                            if (it.data?.toInt() != -1) {
+                                longToastShow("Task Added Successfully")
                             }
                         }
+
                         Status.ERROR -> {
+                            loadingDialog.dismiss()
+                            it.message?.let { it1 -> longToastShow(it1) }
 
                         }
-
                     }
                 }
 
             }
         }
         //add task end
+
         // Update Task Start
         val updateETTitle = updateTaskDialog.findViewById<TextInputEditText>(R.id.edTaskTitle)
         val updateETTitleL = updateTaskDialog.findViewById<TextInputLayout>(R.id.edTaskTitleL)
@@ -166,20 +149,122 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        mainBinding.fabAddTask.setOnClickListener {
+            addTaskDialog.show()
+        }
+
 
         val updateTaskBtn = updateTaskDialog.findViewById<Button>(R.id.updateTaskBtn)
-        updateTaskBtn.setOnClickListener {
-            if (validateEditText(updateETTitle, updateETTitleL)
-                && validateEditText(updateETDesc, updateETDescL)
-            ){
+        // Update Task End
+        val taskRecyclerViewAdapter = TaskRVVBListAdapter { type, position, task ->
+            if (type == "delete") {
+                taskViewModel
+                    .deleteTask(task.id)
+                    .observe(this) {
+                        when (it.status) {
+                            Status.LOADING -> {
+                                loadingDialog.show()
+                            }
+
+                            Status.SUCCESS -> {
+                                loadingDialog.dismiss()
+                                if (it.data?.toInt() != -1) {
+                                    longToastShow("Task Deleted Successfully")
+                                }
+                            }
+
+                            Status.ERROR -> {
+                                loadingDialog.dismiss()
+                                it.message?.let { it1 -> longToastShow(it1) }
+
+                            }
+                        }
+
+                    }
+            } else if (type == "update") {
+                updateETTitle.setText(task.title)
+                updateETDesc.setText(task.description)
+                updateTaskBtn.setOnClickListener {
+                    if (validateEditText(updateETTitle, updateETTitleL)
+                        && validateEditText(updateETDesc, updateETDescL)
+                    ) {
+                        val updateTask = Task(
+                            task.id,
+                            updateETTitle.text.toString().trim(),
+                            updateETDesc.text.toString().trim(),
+//                           here i Date updated
+                            Date()
+                        )
+                        updateTaskDialog.dismiss()
+                        loadingDialog.show()
+                        taskViewModel
+//                            .updateTask(updateTask)
+                            .updateTaskParticularField(task.id,
+                                updateETTitle.text.toString().trim(),
+                                updateETDesc.text.toString().trim(),)
+                            .observe(this) {
+                                when (it.status) {
+                                    Status.LOADING -> {
+                                        loadingDialog.show()
+                                    }
+
+                                    Status.SUCCESS -> {
+                                        loadingDialog.dismiss()
+                                        if (it.data?.toInt() != -1) {
+                                            longToastShow("Task Updated Successfully")
+                                        }
+                                    }
+
+                                    Status.ERROR -> {
+                                        loadingDialog.dismiss()
+                                        it.message?.let { it1 -> longToastShow(it1) }
+
+                                    }
+                                }
+
+                            }
+                    }
+                }
                 updateTaskDialog.show()
-                Toast.makeText(this, "validated!!", Toast.LENGTH_LONG).show()
-                loadingDialog.show()
             }
         }
 
-        // Update Task End
 
+        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
+
+        callGetTaskList(taskRecyclerViewAdapter)
 
     }
+
+    private fun callGetTaskList(taskRecyclerViewAdapter: TaskRVVBListAdapter) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskViewModel.viewTaskList().collect {
+                when (it.status) {
+                    Status.LOADING -> {
+                        loadingDialog.show()
+                    }
+
+                    Status.SUCCESS -> {
+//                        loadingDialog.dismiss()
+//                        it.data?.collect { taskList ->
+//                            taskRecyclerViewAdapter.submitList(taskList)
+//                        }
+                        it.data?.collect { taskList ->
+                            loadingDialog.dismiss()
+                            taskRecyclerViewAdapter.addAllTask(taskList)
+                        }
+
+                    }
+
+                    Status.ERROR -> {
+                        loadingDialog.dismiss()
+                        it.message?.let { it1 -> longToastShow(it1) }
+                    }
+                }
+            }
+        }
+    }
 }
+
+
+

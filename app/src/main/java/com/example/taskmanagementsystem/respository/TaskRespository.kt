@@ -2,11 +2,11 @@ package com.example.taskmanagementsystem.respository
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
-import com.example.madlab4.dao.TaskDao
-import com.example.madlab4.database.TaskDatabase
-import com.example.madlab4.models.Task
-import com.example.madlab4.utils.Resource
-import com.example.madlab4.utils.Resource.*
+import com.example.taskmanagementsystem.dao.TaskDao
+import com.example.taskmanagementsystem.models.Task
+import com.example.taskmanagementsystem.utils.Resource
+import com.example.taskmanagementsystem.utils.Resource.*
+import com.example.taskmanagementsystem.models.TaskDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -28,22 +28,22 @@ class TaskRepository(application: Application) {
     }
 
     fun insertTask(task: Task) = MutableLiveData<Resource<Long>>().apply {
-        postValue(Loading())
+        postValue(Resource.Loading())
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val result = taskDao.insertTask(task)
-                postValue(Success(result))
+                postValue(Resource.Success(result))
             }
         } catch (e: Exception) {
             postValue(Error(e.message.toString()))
         }
     }
     fun deleteTask(taskId: String) = MutableLiveData<Resource<Int>>().apply {
-        postValue(Loading())
+        postValue(Resource.Loading())
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val result = taskDao.deleteTask(taskId)
-                postValue(Success(result))
+                postValue(Resource.Success(result))
             }
         } catch (e: Exception) {
             postValue(Error(e.message.toString()))
@@ -51,22 +51,22 @@ class TaskRepository(application: Application) {
     }
 
     fun updateTask(task: Task) = MutableLiveData<Resource<Int>>().apply {
-        postValue(Loading())
+        postValue(Resource.Loading())
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val result = taskDao.updateTask(task)
-                postValue(Success(result))
+                postValue(Resource.Success(result))
             }
         } catch (e: Exception) {
             postValue(Error(e.message.toString()))
         }
     }
     fun updateTaskParticularField(taskId: String, title: String, description: String) = MutableLiveData<Resource<Int>>().apply {
-        postValue(Loading())
+        postValue(Resource.Loading())
         try {
             CoroutineScope(Dispatchers.IO).launch {
                 val result = taskDao.updateTaskParticularField(taskId, title, description)
-                postValue(Success(result))
+                postValue(Resource.Success(result))
             }
         } catch (e: Exception) {
             postValue(Error(e.message.toString()))

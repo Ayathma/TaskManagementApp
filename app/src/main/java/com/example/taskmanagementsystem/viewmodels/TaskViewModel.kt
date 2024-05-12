@@ -3,44 +3,25 @@ package com.example.taskmanagementsystem.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.room.Query
-import com.coding.meet.todo_app.models.Task
-import com.coding.meet.todo_app.repository.TaskRepository
-import com.coding.meet.todo_app.utils.Resource
 import com.example.taskmanagementsystem.models.Task
 import com.example.taskmanagementsystem.respository.TaskRepository
+import com.example.taskmanagementsystem.utils.Resource
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
-
     private val taskRepository = TaskRepository(application)
-    val taskStateFlow get() =  taskRepository.taskStateFlow
-    val statusLiveData get() =  taskRepository.statusLiveData
-    val sortByLiveData get() =  taskRepository.sortByLiveData
 
-
-
-    fun getTaskList(isAsc : Boolean, sortByName:String) {
-        taskRepository.getTaskList(isAsc, sortByName)
+    fun viewTaskList() = taskRepository.getTaskList()
+    fun insertTask(task: Task): MutableLiveData<Resource<Long>> {
+        return taskRepository.insertTask(task)
     }
 
-    fun insertTask(task: Task){
-        taskRepository.insertTask(task)
+    fun deleteTask(taskId: String): MutableLiveData<Resource<Int>> {
+        return taskRepository.deleteTask(taskId)
     }
-
-    fun deleteTask(task: Task) {
-        taskRepository.deleteTask(task)
+    fun updateTask(task: Task): MutableLiveData<Resource<Int>> {
+        return taskRepository.updateTask(task)
     }
-
-    fun deleteTaskUsingId(taskId: String){
-        taskRepository.deleteTaskUsingId(taskId)
+    fun updateTaskParticularField(taskId: String, title: String, description: String): MutableLiveData<Resource<Int>> {
+        return taskRepository.updateTaskParticularField(taskId, title, description)
     }
-
-    fun updateTask(task: Task) {
-        taskRepository.updateTask(task)
-    }
-
-    fun updateTaskPaticularField(taskId: String,title:String,description:String) {
-        taskRepository.updateTaskPaticularField(taskId, title, description)
-    }
-
 }
