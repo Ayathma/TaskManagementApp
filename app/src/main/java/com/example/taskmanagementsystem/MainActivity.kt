@@ -4,19 +4,52 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.room.Query
+import com.coding.meet.todo_app.adapters.TaskRVVBListAdapter
+import com.coding.meet.todo_app.databinding.ActivityMainBinding
+import com.coding.meet.todo_app.models.Task
+import com.coding.meet.todo_app.utils.Status
+import com.coding.meet.todo_app.utils.StatusResult
+import com.coding.meet.todo_app.utils.StatusResult.Added
+import com.coding.meet.todo_app.utils.StatusResult.Deleted
+import com.coding.meet.todo_app.utils.StatusResult.Updated
+import com.coding.meet.todo_app.utils.clearEditText
+import com.coding.meet.todo_app.utils.hideKeyBoard
+import com.coding.meet.todo_app.utils.longToastShow
+import com.coding.meet.todo_app.utils.setupDialog
+import com.coding.meet.todo_app.utils.validateEditText
+import com.coding.meet.todo_app.viewmodels.TaskViewModel
+import com.example.madlab4.utils.Status
+import com.example.madlab4.utils.clearEditText
 import com.example.madlab4.utils.setupDialog
 import com.example.madlab4.utils.validateEditText
 import com.example.taskmanagementsystem.databinding.ActivityMainBinding
+import com.example.taskmanagementsystem.models.Task
 import com.example.taskmanagementsystem.viewmodels.TaskViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
 
@@ -71,6 +104,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         mainBinding.fabAddTask.setOnClickListener {
+            clearEditText(addETTitle, addETTitleL)
+            clearEditText(addETDesc, addETDescL)
             addTaskDialog.show()
         }
         val saveTaskBtn = addTaskDialog.findViewById<Button>(R.id.saveTaskBtn)
@@ -87,10 +122,23 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 taskViewModel.insertTask(newTask).observe(this){
-                    when(it.status) {
+                    when(it.status){
+                        Status.LOADING -> {
+                            loadingDialog.show()
+                        }
+                        Status.SUCCESS -> {
+                            loadingDialog.dismiss()
+                            if(it.data?.toInt() != -1){
+                                LongToastShow(msg)
+                            }
+                        }
+                        Status.ERROR -> {
+
+                        }
 
                     }
                 }
+
             }
         }
         //add task end

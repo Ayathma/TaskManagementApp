@@ -7,6 +7,8 @@ import androidx.room.Query
 import com.coding.meet.todo_app.models.Task
 import com.coding.meet.todo_app.repository.TaskRepository
 import com.coding.meet.todo_app.utils.Resource
+import com.example.taskmanagementsystem.models.Task
+import com.example.taskmanagementsystem.respository.TaskRepository
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
