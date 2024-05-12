@@ -78,7 +78,7 @@
             <Button
                 android:id="@+id/updateTaskBtn"
                 android:layout_width="115dp"
-                android:layout_height="50dp"
+                android:layout_height="60dp"
                 android:layout_gravity="center"
                 android:text="UPDATE TASK"
                 android:background="@drawable/rounded_button"/>

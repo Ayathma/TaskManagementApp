@@ -4,13 +4,16 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.madlab4.utils.Status
+import com.example.madlab4.utils.Status.*
 import com.example.madlab4.utils.clearEditText
 import com.example.madlab4.utils.longToastShow
 import com.example.madlab4.utils.setupDialog
@@ -102,18 +105,18 @@ class MainActivity : AppCompatActivity() {
 
                 taskViewModel.insertTask(newTask).observe(this) {
                     when (it.status) {
-                        Status.LOADING -> {
+                        LOADING -> {
                             loadingDialog.show()
                         }
 
-                        Status.SUCCESS -> {
+                        SUCCESS -> {
                             loadingDialog.dismiss()
                             if (it.data?.toInt() != -1) {
                                 longToastShow("Task Added Successfully")
                             }
                         }
 
-                        Status.ERROR -> {
+                        ERROR -> {
                             loadingDialog.dismiss()
                             it.message?.let { it1 -> longToastShow(it1) }
 
@@ -162,18 +165,18 @@ class MainActivity : AppCompatActivity() {
                     .deleteTask(task.id)
                     .observe(this) {
                         when (it.status) {
-                            Status.LOADING -> {
+                            LOADING -> {
                                 loadingDialog.show()
                             }
 
-                            Status.SUCCESS -> {
+                            SUCCESS -> {
                                 loadingDialog.dismiss()
                                 if (it.data?.toInt() != -1) {
                                     longToastShow("Task Deleted Successfully")
                                 }
                             }
 
-                            Status.ERROR -> {
+                            ERROR -> {
                                 loadingDialog.dismiss()
                                 it.message?.let { it1 -> longToastShow(it1) }
 
@@ -204,18 +207,18 @@ class MainActivity : AppCompatActivity() {
                                 updateETDesc.text.toString().trim(),)
                             .observe(this) {
                                 when (it.status) {
-                                    Status.LOADING -> {
+                                    LOADING -> {
                                         loadingDialog.show()
                                     }
 
-                                    Status.SUCCESS -> {
+                                    SUCCESS -> {
                                         loadingDialog.dismiss()
                                         if (it.data?.toInt() != -1) {
                                             longToastShow("Task Updated Successfully")
                                         }
                                     }
 
-                                    Status.ERROR -> {
+                                    ERROR -> {
                                         loadingDialog.dismiss()
                                         it.message?.let { it1 -> longToastShow(it1) }
 
@@ -234,17 +237,32 @@ class MainActivity : AppCompatActivity() {
 
         callGetTaskList(taskRecyclerViewAdapter)
 
+        val switchButton = findViewById<Switch>(R.id. switch_button)
+        switchButton.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                callGetTaskListAsc(taskRecyclerViewAdapter)
+            }else{
+                callGetTaskList(taskRecyclerViewAdapter)
+
+            }
+        }
+
+
+
+
     }
+
+
 
     private fun callGetTaskList(taskRecyclerViewAdapter: TaskRVVBListAdapter) {
         CoroutineScope(Dispatchers.Main).launch {
             taskViewModel.viewTaskList().collect {
                 when (it.status) {
-                    Status.LOADING -> {
+                    LOADING -> {
                         loadingDialog.show()
                     }
 
-                    Status.SUCCESS -> {
+                    SUCCESS -> {
 //                        loadingDialog.dismiss()
 //                        it.data?.collect { taskList ->
 //                            taskRecyclerViewAdapter.submitList(taskList)
@@ -256,7 +274,7 @@ class MainActivity : AppCompatActivity() {
 
                     }
 
-                    Status.ERROR -> {
+                    ERROR -> {
                         loadingDialog.dismiss()
                         it.message?.let { it1 -> longToastShow(it1) }
                     }
@@ -264,6 +282,35 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun callGetTaskListAsc(taskRecyclerViewAdapter: TaskRVVBListAdapter) {
+        CoroutineScope(Dispatchers.Main).launch {
+            taskViewModel.viewTaskListAsc().collect {
+                when (it.status) {
+                    LOADING -> {
+                        loadingDialog.show()
+                    }
+
+                    SUCCESS -> {
+//                        loadingDialog.dismiss()
+//                        it.data?.collect { taskList ->
+//                            taskRecyclerViewAdapter.submitList(taskList)
+//                        }
+                        it.data?.collect { taskList ->
+                            loadingDialog.dismiss()
+                            taskRecyclerViewAdapter.addAllTask(taskList)
+                        }
+
+                    }
+
+                    ERROR -> {
+                        loadingDialog.dismiss()
+                        it.message?.let { it1 -> longToastShow(it1) }
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 

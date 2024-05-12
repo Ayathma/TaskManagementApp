@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation ("com.airbnb.android:lottie:6.0.0")
+    implementation(libs.androidx.benchmark.macro)
 
     //room
     val room_version = "2.6.1"

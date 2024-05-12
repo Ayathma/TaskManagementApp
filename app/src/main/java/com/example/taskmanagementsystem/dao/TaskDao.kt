@@ -9,6 +9,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM Task ORDER BY date DESC")
     fun getTaskList(): Flow<List<Task>>
+
+    @Query("SELECT * FROM Task ORDER BY date ASC")
+    fun getTaskListAsc(): Flow<List<Task>>
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task:Task): Long
     @Query("DELETE FROM Task WHERE taskId == :taskId")
@@ -19,4 +22,7 @@ interface TaskDao {
 
     @Query("UPDATE Task SET taskTitle=:title, description=:description WHERE taskId=:taskId")
     suspend fun updateTaskParticularField(taskId: String, title: String, description: String): Int
+
+    @Query("SELECT * FROM Task WHERE taskTitle LIKE :query ORDER BY date DESC")
+    fun searchTaskList(query: String) : Flow<List<Task>>
 }
